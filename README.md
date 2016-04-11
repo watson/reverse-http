@@ -18,7 +18,8 @@ npm install reverse-http --save
 var reverseHttp = require('reverse-http')
 
 var opts = {
-  host: 'example.com'
+  hostname: 'example.com',
+  path: '/foo'
 }
 
 // Open an HTTP connection to example.com and accept reverse HTTP
@@ -47,10 +48,19 @@ and as such exposes the same API.
 
 See the
 [`http.request`](https://nodejs.org/api/http.html#http_http_request_options_callback)
-documentation for details about the `options` properties.
+documentation for details about the `options` properties. Note that the
+HTTP method defaults to `POST`.
 
 The optional `onRequest` callback will be attached as a listener to the
 `request` event.
+
+The following headers are added by default to the establishing outgoing
+HTTP request:
+
+```http
+Upgrade: PTTH/1.0
+Connection: Upgrade
+```
 
 ## License
 
