@@ -8,7 +8,8 @@
   },
   "devDependencies": {
     "tape": "^4.5.1",
-    "server-destroy": "^1.0.1"
+    "server-destroy": "^1.0.1",
+    "standard": "^6.0.8"
   },
   "scripts": {
     "test": "standard && tape test.js"
