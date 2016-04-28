@@ -33,8 +33,6 @@ test('default values', function (t) {
     rserver.on('error', function (err) {
       t.error(err)
     })
-
-    enableDestroy(rserver)
   })
 
   server.on('upgrade', function (req, socket, head) {
@@ -76,8 +74,6 @@ test('reconnect', function (t) {
     rserver.on('error', function (err) {
       t.error(err)
     })
-
-    enableDestroy(rserver)
   })
 
   server.on('upgrade', function (req, socket, head) {
@@ -132,15 +128,12 @@ test('respond', function (t) {
   })
   var rserver
 
-  enableDestroy(server)
-
   server.listen(function () {
     rserver = reverseHttp({ port: server.address().port }, function (req, res) {
       res.writeHead(418)
       res.write('foo')
       res.end()
     })
-    enableDestroy(rserver)
   })
 
   server.on('upgrade', function (req, socket, head) {

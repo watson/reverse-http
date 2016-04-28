@@ -28,31 +28,31 @@ function ReverseServer (opts, onRequest) {
   function connect () {
     if (closed) return
 
-    var socket = net.connect(opts.port, opts.host)
+    server._socket = net.connect(opts.port, opts.host)
 
-    socket.on('connect', upgrade)
-    socket.on('error', onError)
+    server._socket.on('connect', upgrade)
+    server._socket.on('error', onError)
 
     function upgrade () {
       var onClose = once(connect)
-      socket.on('close', onClose)
-      socket.on('end', onClose)
+      server._socket.on('close', onClose)
+      server._socket.on('end', onClose)
 
-      consume(socket, function (err, head) {
+      consume(server._socket, function (err, head) {
         if (err) {
           server.emit('error', err)
           server.close()
         } else if (head.statusCode === 101 &&
             head.headers.upgrade === 'PTTH/1.0' &&
             head.headers.connection === 'Upgrade') {
-          server.emit('connection', socket)
+          server.emit('connection', server._socket)
         } else {
           server.emit('error', new Error('Unexpected response to PTTH/1.0 Upgrade request'))
           server.close()
         }
       })
 
-      socket.write(upgradeRequest)
+      server._socket.write(upgradeRequest)
     }
   }
 
@@ -63,6 +63,11 @@ function ReverseServer (opts, onRequest) {
   function onError (err) {
     server.emit('error', err)
   }
+}
+
+ReverseServer.prototype.destroy = function () {
+  this.close()
+  this._socket.destroy()
 }
 
 function generateRequest (opts) {

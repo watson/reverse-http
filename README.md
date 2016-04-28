@@ -38,7 +38,7 @@ reverseHttp(opts, function (req, res) {
 
 ## API
 
-### `reverseHttp(options[, onRequest])`
+### `var server = reverseHttp(options[, onRequest])`
 
 Create a reverse HTTP connection to the HTTP server specificed in
 `options`. Returns an instance of `ReverseServer`. The `ReverseServer`
@@ -62,6 +62,10 @@ Upgrade: PTTH/1.0
 Connection: Upgrade
 Content-Length: 0
 ```
+
+### `server.destroy()`
+
+Close the server and destroy the socket.
 
 ## License
 
