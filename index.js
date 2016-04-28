@@ -6,6 +6,8 @@ var once = require('once')
 
 module.exports = ReverseServer
 
+util.inherits(ReverseServer, http.Server)
+
 function ReverseServer (opts, onRequest) {
   if (!(this instanceof ReverseServer)) return new ReverseServer(opts, onRequest)
 
@@ -49,5 +51,3 @@ function ReverseServer (opts, onRequest) {
     req.end()
   }
 }
-
-util.inherits(ReverseServer, http.Server)
