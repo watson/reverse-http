@@ -13,9 +13,9 @@ util.inherits(ReverseServer, http.Server)
 function ReverseServer (opts, onRequest) {
   if (!(this instanceof ReverseServer)) return new ReverseServer(opts, onRequest)
 
-  var upgradeRequest = generateRequest(opts)
   var server = this
   var closed = false
+  var upgradeRequest = generateRequest(opts)
 
   http.Server.call(this)
 
