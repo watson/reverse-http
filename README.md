@@ -60,6 +60,7 @@ HTTP request:
 ```http
 Upgrade: PTTH/1.0
 Connection: Upgrade
+Content-Length: 0
 ```
 
 ## License

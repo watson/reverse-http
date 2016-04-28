@@ -22,6 +22,7 @@ function ReverseServer (opts, onRequest) {
   if (!opts.headers) opts.headers = {}
   if (!opts.headers['Upgrade']) opts.headers['Upgrade'] = 'PTTH/1.0'
   if (!opts.headers['Connection']) opts.headers['Connection'] = 'Upgrade'
+  if (!opts.headers['Content-Length']) opts.headers['Content-Length'] = 0
   if (onRequest) this.on('request', onRequest)
 
   var server = this
