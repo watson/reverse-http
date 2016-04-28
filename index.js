@@ -83,9 +83,31 @@ function defaultOptions (opts) {
   if (!opts.host) opts.host = opts.hostname || 'localhost'
   if (!opts.path) opts.path = '/'
   if (!opts.headers) opts.headers = {}
-  if (!opts.headers['Host']) opts.headers['Host'] = opts.host
+  if (!opts.headers['Host']) opts.headers['Host'] = formatHostHeader(opts.host, opts.port)
   if (!opts.headers['Upgrade']) opts.headers['Upgrade'] = 'PTTH/1.0'
   if (!opts.headers['Connection']) opts.headers['Connection'] = 'Upgrade'
   if (!opts.headers['Content-Length']) opts.headers['Content-Length'] = 0
   return opts
+}
+
+// The following algorithm is lifted from Node core:
+// https://github.com/nodejs/node/blob/296bfd2/lib/_http_client.js#L90-L103
+function formatHostHeader (host, port) {
+  var defaultPort = 80 // for now HTTPS is not supported
+  var posColon = -1
+
+  // For the Host header, ensure that IPv6 addresses are enclosed
+  // in square brackets, as defined by URI formatting
+  // https://tools.ietf.org/html/rfc3986#section-3.2.2
+  if ((posColon = host.indexOf(':')) !== -1 &&
+      (posColon = host.indexOf(':', posColon) !== -1) &&
+      host[0] !== '[') {
+    host = '[' + host + ']'
+  }
+
+  if (port && +port !== defaultPort) {
+    host += ':' + port
+  }
+
+  return host
 }
