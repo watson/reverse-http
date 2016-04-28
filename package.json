@@ -4,6 +4,7 @@
   "description": "A reverse HTTP client",
   "main": "index.js",
   "dependencies": {
+    "consume-http-header": "^1.0.0",
     "once": "^1.3.3"
   },
   "devDependencies": {

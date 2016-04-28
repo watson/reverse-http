@@ -1,8 +1,10 @@
 'use strict'
 
 var util = require('util')
+var net = require('net')
 var http = require('http')
 var once = require('once')
+var consume = require('consume-http-header')
 
 module.exports = ReverseServer
 
@@ -35,19 +37,37 @@ function ReverseServer (opts, onRequest) {
     if (closed) return
 
     var onClose = once(connect)
-    var req = http.request(opts)
+    var socket = net.connect(opts)
 
-    req.on('error', function (err) {
-      server.emit('error', err)
-    })
+    socket.on('connect', upgrade)
+    socket.on('error', onError)
 
-    req.on('upgrade', function (res, socket, head) {
+    function upgrade () {
       socket.on('close', onClose)
       socket.on('end', onClose)
-      server.emit('connection', socket)
-      if (head.length) socket.push(head)
-    })
 
-    req.end()
+      consume(socket, function (err, head) {
+        if (err) {
+          server.emit('error', err)
+          socket.destroy()
+        } else if (head.statusCode === 101 &&
+            head.headers.upgrade === 'PTTH/1.0' &&
+            head.headers.connection === 'Upgrade') {
+          server.emit('connection', socket)
+        } else {
+          server.emit('error', new Error('Unexpected response to PTTH/1.0 Upgrade request'))
+          socket.destroy()
+        }
+      })
+
+      socket.write('POST / HTTP/1.1\r\n' +
+                   'Upgrade: PTTH/1.0\r\n' +
+                   'Connection: Upgrade\r\n' +
+                   'Content-Length: 0\r\n\r\n')
+    }
+  }
+
+  function onError (err) {
+    server.emit('error', err)
   }
 }
