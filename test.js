@@ -12,8 +12,6 @@ test('default values', function (t) {
     t.fail('Unexpected HTTP request')
   })
 
-  enableDestroy(server)
-
   server.listen(function () {
     var n = 0
     var rserver = reverseHttp({ port: server.address().port }, function (req, res) {
@@ -24,7 +22,8 @@ test('default values', function (t) {
           t.equal(req.url, '/foo')
           break
         case 2:
-          rserver.close(server.destroy.bind(server))
+          server.close()
+          rserver.destroy()
           t.equal(req.method, 'GET')
           t.equal(req.url, '/bar')
           break
@@ -34,6 +33,8 @@ test('default values', function (t) {
     rserver.on('error', function (err) {
       t.error(err)
     })
+
+    enableDestroy(rserver)
   })
 
   server.on('upgrade', function (req, socket, head) {
@@ -58,8 +59,6 @@ test('reconnect', function (t) {
     t.fail('Unexpected HTTP request')
   })
 
-  enableDestroy(server)
-
   server.listen(function () {
     var rserver = reverseHttp({ port: server.address().port }, function (req, res) {
       res.end()
@@ -68,7 +67,8 @@ test('reconnect', function (t) {
       t.equal(req.url, '/foo')
 
       if (n === 2) {
-        rserver.close(server.destroy.bind(server))
+        server.close()
+        rserver.destroy()
         t.ok(true)
       }
     })
@@ -76,6 +76,8 @@ test('reconnect', function (t) {
     rserver.on('error', function (err) {
       t.error(err)
     })
+
+    enableDestroy(rserver)
   })
 
   server.on('upgrade', function (req, socket, head) {
@@ -138,6 +140,7 @@ test('respond', function (t) {
       res.write('foo')
       res.end()
     })
+    enableDestroy(rserver)
   })
 
   server.on('upgrade', function (req, socket, head) {
@@ -150,10 +153,11 @@ test('respond', function (t) {
       socket.write('GET /foo HTTP/1.1\r\n\r\n')
     }, 50)
 
-    socket.on('data', function (chunk) {
+    socket.once('data', function (chunk) {
       var lines = chunk.toString().split('\r\n')
       t.equal(lines[0], 'HTTP/1.1 418 I\'m a teapot')
-      rserver.close(server.destroy.bind(server))
+      server.close()
+      rserver.destroy()
     })
   })
 })
