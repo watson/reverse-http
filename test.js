@@ -123,3 +123,40 @@ test('remote server goes offline', function (t) {
     }, 50)
   })
 })
+
+test('respond', function (t) {
+  t.plan(1)
+
+  var server = http.createServer(function (req, res) {
+    t.fail('Unexpected HTTP request')
+  })
+  var rserver
+
+  enableDestroy(server)
+
+  server.listen(function () {
+    rserver = reverseHttp({ port: server.address().port }, function (req, res) {
+      res.writeHead(418)
+      res.write('foo')
+      res.end()
+    })
+  })
+
+  server.on('upgrade', function (req, socket, head) {
+    socket.write('HTTP/1.1 101 Switching Protocols\r\n' +
+                 'Upgrade: PTTH/1.0\r\n' +
+                 'Connection: Upgrade\r\n' +
+                 '\r\n')
+
+    setTimeout(function () {
+      socket.write('GET /foo HTTP/1.1\r\n\r\n')
+    }, 50)
+
+    socket.on('data', function (chunk) {
+      var lines = chunk.toString().split('\r\n')
+      t.equal(lines[0], 'HTTP/1.1 418 I\'m a teapot')
+      rserver.close()
+      server.destroy()
+    })
+  })
+})
