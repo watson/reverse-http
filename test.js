@@ -24,8 +24,7 @@ test('default values', function (t) {
           t.equal(req.url, '/foo')
           break
         case 2:
-          rserver.close()
-          server.destroy()
+          rserver.close(server.destroy.bind(server))
           t.equal(req.method, 'GET')
           t.equal(req.url, '/bar')
           break
@@ -69,8 +68,7 @@ test('reconnect', function (t) {
       t.equal(req.url, '/foo')
 
       if (n === 2) {
-        rserver.close()
-        server.destroy()
+        rserver.close(server.destroy.bind(server))
         t.ok(true)
       }
     })
@@ -155,8 +153,7 @@ test('respond', function (t) {
     socket.on('data', function (chunk) {
       var lines = chunk.toString().split('\r\n')
       t.equal(lines[0], 'HTTP/1.1 418 I\'m a teapot')
-      rserver.close()
-      server.destroy()
+      rserver.close(server.destroy.bind(server))
     })
   })
 })
