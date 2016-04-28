@@ -80,7 +80,7 @@ function generateRequest (opts) {
 function defaultOptions (opts) {
   if (!opts) opts = {}
   if (!opts.method) opts.method = 'POST'
-  if (!opts.host) opts.host = 'localhost'
+  if (!opts.host) opts.host = opts.hostname || 'localhost'
   if (!opts.path) opts.path = '/'
   if (!opts.headers) opts.headers = {}
   if (!opts.headers['Host']) opts.headers['Host'] = opts.host
