@@ -50,8 +50,9 @@ function ReverseServer (opts, onRequest) {
           server.emit('error', err)
           server.close()
         } else if (head.statusCode === 101 &&
-            head.headers.upgrade === 'PTTH/1.0' &&
-            head.headers.connection === 'Upgrade') {
+            head.headers.connection &&
+            head.headers.connection.toLowerCase() === 'upgrade' &&
+            head.headers.upgrade === 'PTTH/1.0') {
           server.emit('connection', server._socket)
         } else {
           server.emit('error', new Error('Unexpected response to PTTH/1.0 Upgrade request'))
