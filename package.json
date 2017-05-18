@@ -1,6 +1,6 @@
 {
   "name": "reverse-http",
-  "version": "1.2.0",
+  "version": "1.3.0",
   "description": "A reverse HTTP client",
   "main": "index.js",
   "dependencies": {
@@ -36,7 +36,7 @@
   },
   "homepage": "https://github.com/watson/reverse-http#readme",
   "coordinates": [
-    52.5308851,
-    13.3838543
+    37.7609853,
+    -122.4344983
   ]
 }
