@@ -46,10 +46,13 @@ inherits from
 [`http.Server`](https://nodejs.org/api/http.html#http_class_http_server)
 and as such exposes the same API.
 
-See the
+Besides the regular `options` inherited from
 [`http.request`](https://nodejs.org/api/http.html#http_http_request_options_callback)
-documentation for details about the `options` properties. Note that the
-HTTP method defaults to `POST`.
+the following special options are also available:
+
+- `tls` - create an https connection (default: `false`)
+
+Note that the HTTP method defaults to `POST`.
 
 The optional `onRequest` callback will be attached as a listener to the
 `request` event.
