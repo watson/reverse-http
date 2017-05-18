@@ -51,6 +51,8 @@ Besides the regular `options` inherited from
 the following special options are also available:
 
 - `tls` - create an https connection (default: `false`)
+- `rejectUnauthorized` - if `true`, the server certificate is verified
+  (default: `true`)
 
 Note that the HTTP method defaults to `POST`.
 

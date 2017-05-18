@@ -31,7 +31,8 @@ function ReverseServer (opts, onRequest) {
 
     if (opts.tls) {
       server._socket = tls.connect(opts.port, opts.host, {
-        servername: opts.servername || opts.host
+        servername: opts.servername || opts.host,
+        rejectUnauthorized: opts.rejectUnauthorized !== false
       })
       server._socket.on('secureConnect', upgrade)
     } else {
