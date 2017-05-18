@@ -2,6 +2,8 @@
 
 var test = require('tape')
 var http = require('http')
+var https = require('https')
+var pem = require('https-pem')
 var enableDestroy = require('server-destroy')
 var reverseHttp = require('./')
 
@@ -152,5 +154,49 @@ test('respond', function (t) {
       server.close()
       rserver.destroy()
     })
+  })
+})
+
+test('https', function (t) {
+  t.plan(4)
+
+  var server = https.createServer(pem, function (req, res) {
+    t.fail('Unexpected HTTP request')
+  })
+
+  server.listen(function () {
+    var n = 0
+    var rserver = reverseHttp({ port: server.address().port, tls: true, rejectUnauthorized: false }, function (req, res) {
+      res.end()
+      switch (++n) {
+        case 1:
+          t.equal(req.method, 'GET')
+          t.equal(req.url, '/foo')
+          break
+        case 2:
+          server.close()
+          rserver.destroy()
+          t.equal(req.method, 'GET')
+          t.equal(req.url, '/bar')
+          break
+      }
+    })
+
+    rserver.on('error', function (err) {
+      t.error(err)
+    })
+  })
+
+  server.on('upgrade', function (req, socket, head) {
+    socket.write('HTTPS/1.1 101 Switching Protocols\r\n' +
+                 'Upgrade: PTTH/1.0\r\n' +
+                 'Connection: Upgrade\r\n' +
+                 '\r\n')
+
+    socket.write('GET /foo HTTP/1.1\r\n\r\n')
+
+    setTimeout(function () {
+      socket.write('GET /bar HTTP/1.1\r\n\r\n')
+    }, 50)
   })
 })
